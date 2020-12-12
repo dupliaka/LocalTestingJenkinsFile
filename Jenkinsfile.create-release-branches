@@ -7,23 +7,19 @@ pipeline {
     agent {
         label 'master'
     }
-
-    parameters {
-        string(name: 'BUILD_NAME', defaultValue: 'FirstBuild', description: 'Branch name will be')
-    }
     environment {
-        BASE_BRANCH = 'master'
+        CUSTOM_BASES = getCustomBasesMap()
+    }
+    parameters {
+        string(name: 'CUSTOM_BASE_NAME', defaultValue: '', description: '')
     }
 
     stages {
         stage('Initialize') {
             steps {
                 script {
-                    def buildParams = []
-                    addStringParam(buildParams, 'CUSTOM_BASE_NAME', getCustomBases())
-                    echo "Pass ${CUSTOM_BASE_NAME}"
-                    addStringParam(buildParams, 'REPOSITORIES', repositories.join(','))
-                    buildJob(CREATE_RELEASE_BRANCHES, buildParams)
+                    def branchName = getBranch("kogito-runtimes")
+                    echo "Branchname: ${branchName}"
                 }
             }
         }
@@ -31,7 +27,19 @@ pipeline {
 }
 
 
+String getBranch(String repo) {
+    return (env.CUSTOM_BASES && env.CUSTOM_BASES.containsKey(repo))?env.CUSTOM_BASES.get(repo):env.BASE_BRANCH;
+}
 
-String getCustomBases(){
-    return CUSTOM_BASES.toMapString()
+def getCustomBasesMap() {
+    def mapCustomBases=[:]
+    if (params.CUSTOM_BASES) {
+        mapCustomBases = params.CUSTOM_BASES[1..-2]
+                .split(', ')
+                .collectEntries { entry ->
+                    def pair = entry.split(':')
+                    [(pair.first()): pair.last()]
+                }
+    }
+    return mapCustomBases
 }
