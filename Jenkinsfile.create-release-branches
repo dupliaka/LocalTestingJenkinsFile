@@ -1,6 +1,6 @@
 @Library('jenkins-pipeline-shared-libraries') _
 
-CREATE_RELEASE_BRANCHES = 'Jenkinsfile.create-release-branches'
+CREATE_RELEASE_BRANCHES = 'create-release-branches'
 CUSTOM_BASES=['optaplanner-quickstarts':'development','kogito-pipelines':'master']
 
 pipeline {
