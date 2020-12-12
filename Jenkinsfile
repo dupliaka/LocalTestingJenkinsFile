@@ -22,6 +22,12 @@ pipeline {
     }
 }
 
+def buildJob(String jobName, List buildParams) {
+   build(job: "./${jobName}", wait: true, parameters: buildParams, propagate: false)
+}
+void addStringParam(List params, String key, String value){
+    params.add(string(name: key, value: value))
+}
 
 
 String getCustomBases(){
